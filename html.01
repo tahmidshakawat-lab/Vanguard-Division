@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanguard Division - Euro 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d121f;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            background-image: radial-gradient(circle at top, #1e293b 0%, #0d121f 60%);
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 50px;
+        }
+        .header-title {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: -0.01em;
+        }
+        .glass-card {
+            background: rgba(20, 27, 43, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+        .match-card {
+            background: #161e2e;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .match-card:hover {
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+        .field-container {
+            background: #142761;
+            border: 2px solid #2563eb;
+            border-radius: 32px;
+            position: relative;
+            aspect-ratio: 4 / 5;
+            max-width: 500px;
+            margin: 40px auto;
+            box-shadow: 0 0 50px rgba(37, 99, 235, 0.2);
+            overflow: hidden;
+        }
+        .field-lines {
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+        .player-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 3px solid white;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
+            transition: transform 0.2s;
+        }
+        .st-badge { background: #3b82f6; }
+        .cam-badge { background: #10b981; }
+        .def-badge { background: #ffffff; color: black; }
+        .gk-badge { background: #f59e0b; }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+            color: #60a5fa !important;
+        }
+
+        [contenteditable]:focus {
+            outline: 2px solid #3b82f6;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .bracket-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: #64748b;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade { animation: fadeIn 0.8s ease forwards; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header -->
+    <header class="text-center mb-16 animate-fade">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-900 rounded-xl mb-6 border border-slate-700 shadow-2xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-blue-500/10"></div>
+            <svg class="w-12 h-12 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#b91c1c" stroke="#b91c1c" />
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="white" />
+            </svg>
+        </div>
+        <h1 class="header-title text-5xl md:text-8xl font-extrabold mb-2 tracking-tight text-white">Vanguard Division</h1>
+        <p class="text-blue-400/80 text-xs font-bold tracking-[0.3em] uppercase mb-8">Euro 2026 Match Fixture & Stats</p>
+        
+        <div class="flex flex-col items-center gap-4">
+            <div class="bg-slate-900 border border-slate-700 px-4 py-1.5 rounded-full text-[10px] font-bold">
+                CREATED BY <span class="text-blue-400">TAHMID</span> • <span class="text-slate-500"> 2026</span>
+            </div>
+            <button onclick="toggleEditMode()" id="editBtn" class="bg-blue-600 hover:bg-blue-700 px-8 py-2.5 rounded-full text-xs font-black transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                ENABLE EDIT MODE
+            </button>
+            <div id="saveNotice" class="hidden text-green-400 text-[10px] font-black items-center gap-2">
+                <span class="animate-pulse">●</span> EDITING ACTIVE - AUTO-SAVING TO BROWSER
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto space-y-24">
+        
+      <!-- Stats Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Top Scorers -->
+            <div class="glass-card p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="text-orange-500">🏆</span> TOP-SCORERS
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[9px] text-blue-400 font-bold uppercase mb-1">LEADER</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-sm editable">Tahsin & Tahmid</p>
+                            <span class="text-2xl font-black text-blue-500 editable">18</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+                        <div>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase mb-0.5">RUNNER UP</p>
+                            <p class="text-xs font-bold text-slate-300 editable">Rifan</p>
+                        </div>
+                        <span class="font-black text-xl text-slate-300 editable">7</span>
+                    </div>
+                    <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+                        <div>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase mb-0.5">THIRD</p>
+                            <p class="text-xs font-bold text-slate-300 editable">Rohan</p>
+                        </div>
+                        <span class="font-black text-xl text-orange-500 editable">6</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playmakers -->
+            <div class="glass-card p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="text-green-500">⚽</span> PLAYMAKERS
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[9px] text-green-400 font-bold uppercase mb-1">KING</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-sm editable">Tahmid</p>
+                            <span class="text-2xl font-black text-green-500 editable">13</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+                        <p class="text-xs font-bold text-slate-300 editable">Shanto</p>
+                        <span class="font-black text-xl text-slate-300 editable">12</span>
+                    </div>
+                    <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+                        <p class="text-xs font-bold text-slate-300 editable">Tahsin & Rifan</p>
+                        <span class="font-black text-xl text-slate-300 editable">6</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Walls -->
+            <div class="glass-card p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="text-red-500">🛡️</span> WALLS
+                </h3>
+                <div class="space-y-6">
+                    <div class="match-card bg-slate-900/50 border-red-500/20">
+                        <p class="text-[9px] text-red-400 font-bold uppercase mb-1">ELITE</p>
+                        <p class="font-bold text-sm editable">Rafi</p>
+                    </div>
+                    <div class="match-card bg-slate-900/50 border-slate-700">
+                        <p class="text-[9px] text-slate-500 font-bold uppercase mb-1">MEMBER</p>
+                        <p class="text-sm font-bold editable">Mushfiq</p>
+                    </div>
+                    <div class="match-card bg-slate-900/50 border-slate-700">
+                        <p class="text-[9px] text-slate-500 font-bold uppercase mb-1">MEMBER</p>
+                        <p class="text-sm font-bold editable">Farhan</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goalkeepers -->
+            <div class="glass-card p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="text-yellow-500">🧤</span> GOAL KEEPERS
+                </h3>
+                <div class="space-y-6">
+                    <div class="match-card bg-slate-900/50 border-yellow-500/20">
+                        <p class="text-[9px] text-yellow-400 font-bold uppercase mb-1">GOLDEN GLOVE</p>
+                        <p class="font-bold text-sm editable">Shafin</p>
+                    </div>
+                    <div class="match-card bg-slate-900/50 border-slate-700">
+                        <p class="text-[9px] text-slate-500 font-bold uppercase mb-1">RUNNER UP</p>
+                        <p class="text-sm font-bold editable">Shanto</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Honorable Mention Section for Mobile (Visible on small screens) -->
+        <section class="xl:hidden">
+             <div class="glass-card p-6 border-blue-500/30">
+                <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    ⭐ HONORABLE MENTION
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                        <p class="text-[8px] text-slate-500 font-bold uppercase">Attacker</p>
+                        <p class="text-sm font-bold editable">Oisik</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                        <p class="text-[8px] text-slate-500 font-bold uppercase">Midfielder</p>
+                        <p class="text-sm font-bold editable">Raad</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                        <p class="text-[8px] text-slate-500 font-bold uppercase">Defender</p>
+                        <p class="text-sm font-bold editable">Farabi</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                        <p class="text-[8px] text-slate-500 font-bold uppercase">Goalkeeper</p>
+                        <p class="text-sm font-bold editable">Shafin</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tournament Bracket with 3rd Place -->
+        <section class="animate-fade" style="animation-delay: 0.4s">
+            <h2 class="header-title text-4xl text-center mb-12 italic border-b-4 border-blue-500 inline-block px-4 ml-1/2 -translate-x-1/2 relative left-1/2">Final Bracket</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Round of 16 -->
+                <div>
+                    <p class="bracket-label text-slate-500 text-center">Round of 16</p>
+                    <div class="space-y-4">
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Portugal</span> <span class="bg-black/40 px-2 rounded font-bold editable">0</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-green-400 editable">Ireland</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">3</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs text-green-400 editable">France</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">7</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Italy</span> <span class="bg-black/40 px-2 rounded font-bold editable">3</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Netherlands</span> <span class="bg-black/40 px-2 rounded font-bold editable">3</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-green-400 editable">Spain</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">3+1</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">England</span> <span class="bg-black/40 px-2 rounded font-bold editable">6</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-green-400 editable">Turkey</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">7</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs text-green-400 editable">Denmark</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">8</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Serbia</span> <span class="bg-black/40 px-2 rounded font-bold editable">3</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs text-green-400 editable">Slovenia</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">8</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Czech</span> <span class="bg-black/40 px-2 rounded font-bold editable">6</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Poland</span> <span class="bg-black/40 px-2 rounded font-bold editable">3</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-green-400 editable">Sweden</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">2</span></div>
+                        </div>
+                        <div class="match-card">
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs text-green-400 editable">Germany</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">2</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Croatia</span> <span class="bg-black/40 px-2 rounded font-bold editable">1</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quarter Finals -->
+                <div class="pt-8">
+                    <p class="bracket-label text-blue-500 text-center">Quarter Finals</p>
+                    <div class="space-y-12">
+                        <div class="match-card border-l-4 border-blue-500">
+                            <p class="text-[8px] text-blue-400 font-black mb-2">MATCH 1</p>
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs text-green-400 editable">Ireland</span> <span class="bg-green-900/40 px-2 rounded font-bold editable">14</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">France</span> <span class="bg-black/40 px-2 rounded font-bold editable">3</span></div>
+                        </div>
+                        <div class="match-card border-l-4 border-slate-700">
+                            <p class="text-[8px] text-slate-500 font-black mb-2">MATCH 2</p>
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Spain</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Turkey</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                        </div>
+                        <div class="match-card border-l-4 border-slate-700">
+                            <p class="text-[8px] text-slate-500 font-black mb-2">MATCH 3</p>
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Denmark</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Slovenia</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                        </div>
+                        <div class="match-card border-l-4 border-slate-700">
+                            <p class="text-[8px] text-slate-500 font-black mb-2">MATCH 4</p>
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs editable">Poland</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs editable">Germany</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Semi Finals & 3rd Place -->
+                <div class="pt-20">
+                    <p class="bracket-label text-purple-400 text-center">Semi Finals</p>
+                    <div class="space-y-12">
+                        <div class="glass-card p-6 text-center border-purple-500/30 relative">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-purple-500 text-[8px] font-black px-2 py-0.5 rounded uppercase">Semi 1</div>
+                            <p class="text-sm font-bold italic editable">Ireland</p>
+                            <div class="h-px bg-white/10 my-3 flex items-center justify-center"><span class="bg-[#141b2b] px-2 text-[8px] text-slate-500">VS</span></div>
+                            <p class="text-[10px] text-slate-500 uppercase font-black editable">Winner Match 2</p>
+                        </div>
+                        <div class="glass-card p-6 text-center border-slate-700 relative">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-700 text-[8px] font-black px-2 py-0.5 rounded uppercase">Semi 2</div>
+                            <p class="text-sm font-bold italic editable">Winner Match 3</p>
+                            <div class="h-px bg-white/10 my-3 flex items-center justify-center"><span class="bg-[#141b2b] px-2 text-[8px] text-slate-500">VS</span></div>
+                            <p class="text-[10px] text-slate-500 uppercase font-black editable">Winner Match 4</p>
+                        </div>
+                    </div>
+
+                    <!-- 3rd Place Match -->
+                    <div class="mt-20">
+                        <p class="bracket-label text-orange-400 text-center">3rd Place Play-off</p>
+                        <div class="match-card border-orange-500/40 bg-orange-500/5 py-6">
+                            <p class="text-[8px] text-orange-400 font-black text-center mb-4 uppercase">Battle for Bronze</p>
+                            <div class="flex justify-between items-center mb-1"><span class="text-xs italic editable">Loser Semi 1</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs italic editable">Loser Semi 2</span> <span class="bg-black/40 px-2 rounded font-bold editable">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grand Final -->
+                <div class="pt-32">
+                    <p class="bracket-label text-yellow-500 text-center">The Grand Final</p>
+                    <div class="border-2 border-yellow-500/30 rounded-2xl p-8 text-center bg-yellow-500/5 relative overflow-hidden">
+                        <p class="text-yellow-500 font-black text-[10px] mb-4 tracking-[0.3em]">🏆 EURO 2026 FINAL</p>
+                        <div class="flex flex-col gap-6">
+                            <p class="text-slate-500 text-[9px] uppercase font-black editable">Finalist 1</p>
+                            <h4 class="text-6xl font-black italic text-white">VS</h4>
+                            <p class="text-slate-500 text-[9px] uppercase font-black editable">Finalist 2</p>
+                        </div>
+                        <div class="mt-8 bg-yellow-500/20 border border-yellow-500 text-yellow-500 py-3 rounded text-[10px] font-black tracking-widest uppercase">
+                            AWAITING RESULT
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formation Section -->
+        <section class="py-20 animate-fade" style="animation-delay: 0.6s">
+            <h2 class="header-title text-6xl text-center mb-16 italic text-white">
+                <span class="text-blue-400">TEAM</span> OF THE <span class="text-green-400">WEEK</span>
+            </h2>
+            <div class="field-container">
+                <div class="field-lines"></div>
+                <div class="center-circle"></div>
+                <div class="absolute inset-0 p-8 flex flex-col justify-between">
+                    <div class="flex justify-around mt-4">
+                        <div class="text-center">
+                            <div class="player-badge st-badge mx-auto">ST</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Tahsin</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="player-badge st-badge mx-auto">ST</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Rifan</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-around">
+                        <div class="text-center">
+                            <div class="player-badge cm-badge mx-auto">CM</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Rohan</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="player-badge cm-badge mx-auto">CM</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Tahmid</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between px-4">
+                        <div class="text-center">
+                            <div class="player-badge def-badge mx-auto">CB</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Farhan</p>
+                        </div>
+                        <div class="text-center -mb-8">
+                            <div class="player-badge def-badge mx-auto">CB</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Mushfiq</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="player-badge def-badge mx-auto">CB</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Rafi</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="text-center">
+                            <div class="player-badge gk-badge mx-auto">GK</div>
+                            <p class="mt-2 bg-black/80 px-3 py-0.5 rounded text-[10px] font-black uppercase editable">Shanto</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+<!-- Formation Section -->
+        <section class="py-20 animate-fade" style="animation-delay: 0.6s">
+            <h2 class="header-title text-6xl text-center mb-16 italic text-white">
+                <span class="text-blue-400">ballond'or</span> coming <span class="text-green-400">soon</span>
+    <footer class="text-center py-20 text-slate-700 text-[10px] font-black uppercase tracking-[0.5em] border-t border-white/5">
+        &copy; 2026 VANGUARD DIVISION • EURO LEAGUE ELITE
+    </footer>
+
+    <!-- PIN Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50 p-4 backdrop-blur-md">
+        <div class="bg-[#141b2b] p-10 rounded-3xl border border-slate-700 max-w-sm w-full">
+            <h3 class="text-2xl font-black mb-2 text-center">Admin Access</h3>
+            <p class="text-slate-500 text-[10px] mb-8 text-center font-bold uppercase tracking-widest">Enter PIN (3275)</p>
+            <input type="password" id="passInput" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 text-center tracking-[0.5em] text-2xl font-black focus:border-blue-500 outline-none" placeholder="••••">
+            <div class="flex gap-3">
+                <button onclick="closeModal()" class="flex-1 py-4 text-slate-500 text-[10px] font-black">CANCEL</button>
+                <button onclick="verifyPassword()" class="flex-1 bg-blue-600 py-4 rounded-xl font-black text-[10px] tracking-widest">VERIFY</button>
+            </div>
+            <p id="errorMsg" class="text-red-500 text-[10px] mt-6 text-center hidden font-black">INCORRECT PIN</p>
+        </div>
+    </div>
+
+    <script>
+        let isEditMode = false;
+        const ADMIN_PASS = "3275";
+
+        function toggleEditMode() {
+            if (!isEditMode) {
+                document.getElementById('passwordModal').style.display = 'flex';
+                document.getElementById('passInput').focus();
+            } else {
+                disableEditing();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passInput').value = '';
+        }
+
+        function verifyPassword() {
+            const input = document.getElementById('passInput').value;
+            if (input === ADMIN_PASS) {
+                enableEditing();
+                closeModal();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+                setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
+            }
+        }
+
+        function enableEditing() {
+            isEditMode = true;
+            document.getElementById('editBtn').innerText = "EXIT EDIT MODE";
+            document.getElementById('editBtn').classList.replace('bg-blue-600', 'bg-red-600');
+            document.getElementById('saveNotice').classList.remove('hidden');
+            document.querySelectorAll('.editable').forEach((el, index) => {
+                el.contentEditable = "true";
+                el.classList.add('glow-text');
+                el.oninput = () => { localStorage.setItem(`vanguard-final-v3-${index}`, el.innerText); };
+            });
+        }
+
+        function disableEditing() {
+            isEditMode = false;
+            document.getElementById('editBtn').innerText = "ENABLE EDIT MODE";
+            document.getElementById('editBtn').classList.replace('bg-red-600', 'bg-blue-600');
+            document.getElementById('saveNotice').classList.add('hidden');
+            document.querySelectorAll('.editable').forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('glow-text');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.editable').forEach((el, index) => {
+                const saved = localStorage.getItem(`vanguard-final-v3-${index}`);
+                if (saved) el.innerText = saved;
+            });
+        });
+
+        document.getElementById('passInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyPassword();
+        });
+    </script>
+</body>
+</html>
